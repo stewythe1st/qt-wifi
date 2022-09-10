@@ -1,0 +1,24 @@
+{
+	"wifi_params": [
+		{
+			"id": "Bill Wi the Science Fi",
+			"auth": "passwordpassword1"
+		},
+		{
+			"id": "House LANnister",
+			"auth": "passwordpassword2"
+		},
+		{
+			"id": "FBI Surveilance Van #42",
+			"auth": "passwordpassword3"
+		},
+		{
+			"id": "Router? I Hardly Knew Her",
+			"auth": "passwordpassword4"
+		},
+		{
+			"id": "The Lord of the Pings",
+			"auth": "passwordpassword5"
+		}
+	]
+}

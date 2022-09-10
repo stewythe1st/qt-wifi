@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/Icon.qml</file>
+        <file>qml/Theme.qml</file>
+        <file>qml/qmldir</file>
+        <file>img/eye.png</file>
+        <file>img/user.png</file>
+        <file>img/wifi_1.png</file>
+        <file>img/wifi_2.png</file>
+        <file>img/wifi_3.png</file>
+        <file>img/wifi_4.png</file>
+        <file>data/networks1.json</file>
+        <file>data/networks2.json</file>
+        <file>data/networks3.json</file>
+    </qresource>
+</RCC>

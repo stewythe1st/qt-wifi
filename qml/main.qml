@@ -31,6 +31,10 @@ Window {
     anchors.top: parent.top
     anchors.margins: parent.width * 0.10
     spacing: 20
+
+    /******************************************************
+     * Header text
+     *****************************************************/
     Text {
       height: 50
       width: parent.width
@@ -41,16 +45,68 @@ Window {
       font.family: Theme.font
       color: Theme.colorText
     }
+
+    /******************************************************
+     * Network list popup
+     *****************************************************/
     ComboBox {
       id: networkList
       width: parent.width
       height: 50
       model: ConnectionManager.networks
-      delegate: networkDelegateComponent
       currentIndex: -1
       onAccepted: connectButton.clicked()
       onCurrentIndexChanged: {
         passwordField.text = ConnectionManager.networks[currentIndex].password
+      }
+      /* Style components */
+      delegate: ItemDelegate {
+        id: networkDelegate
+        required property int index
+        required property var modelData
+        width: column.width
+        height: networkList.height
+        background: Rectangle {
+          color: networkDelegate.hovered ? Theme.colorEditBoxHovered : Theme.colorEditBox
+        }
+        contentItem: Item {
+          Text {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.rightMargin: parent.height * 1.25
+            height: parent.height * 0.66
+            font.pixelSize: parent.height * 0.60
+            fontSizeMode: Text.HorizontalFit
+            font.family: Theme.font
+            color: Theme.colorText
+            text: modelData.name
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
+          }
+          Text {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.rightMargin: parent.height
+            height: parent.height * 0.33
+            font.pixelSize: parent.height * 0.33
+            fontSizeMode: Text.HorizontalFit
+            font.family: Theme.font
+            color: Theme.colorText
+            text: modelData.message
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
+          }
+          Icon {
+            anchors.right: parent.right
+            height: parent.height
+            width: height
+            source: "qrc:/img/wifi_%1.png".arg(modelData.strength)
+            color: Theme.colorText
+          }
+        }
+        highlighted: networkList.highlightedIndex === index
       }
       contentItem: Text {
         leftPadding: height * 0.20
@@ -83,13 +139,20 @@ Window {
         }
       }
     }
+
+    /******************************************************
+     * Password entry field
+     *****************************************************/
     TextField {
       id: passwordField
       width: parent.width
       height: 50
       enabled: networkList.currentIndex >= 0
       echoMode: TextInput.Password
-      validator: RegularExpressionValidator { regularExpression: /^\D{1}\S{15,}$/ }
+      validator: RegularExpressionValidator {
+        /* 16 chars, first can't be a number */
+        regularExpression: /^\D{1}\S{15,}$/
+      }
       onAccepted: connectButton.clicked()
       color: Theme.colorText
       selectByMouse: true
@@ -98,7 +161,6 @@ Window {
         border.color: Theme.colorSelected
         border.width: passwordField.focus ? 2 : 0
       }
-
       MouseArea {
         height: parent.height
         width: height
@@ -117,9 +179,14 @@ Window {
         }
       }
     }
+
     Item {
       height: 50
       width: parent.width
+
+      /******************************************************
+       * User/status icon
+       *****************************************************/
       Icon {
         id: userIcon
         height: parent.height
@@ -142,6 +209,10 @@ Window {
         color: Theme.colorText
         source: userIcon
       }
+
+      /******************************************************
+       * Connect button
+       *****************************************************/
       Button {
         id: connectButton
         text: "Connect"
@@ -168,57 +239,6 @@ Window {
           border.width: connectButton.focus ? 2 : 0
         }
       }
-    }
-  }
-  Component {
-    id: networkDelegateComponent
-    ItemDelegate {
-      id: networkDelegate
-      required property int index
-      required property var modelData
-      width: column.width
-      height: networkList.height
-      background: Rectangle {
-        color: networkDelegate.hovered ? Theme.colorEditBoxHovered : Theme.colorEditBox
-      }
-      contentItem: Item {
-        Text {
-          anchors.top: parent.top
-          anchors.left: parent.left
-          anchors.right: parent.right
-          anchors.rightMargin: parent.height * 1.25
-          height: parent.height * 0.66
-          font.pixelSize: parent.height * 0.60
-          fontSizeMode: Text.HorizontalFit
-          font.family: Theme.font
-          color: Theme.colorText
-          text: modelData.name
-          elide: Text.ElideRight
-          verticalAlignment: Text.AlignVCenter
-        }
-        Text {
-          anchors.bottom: parent.bottom
-          anchors.left: parent.left
-          anchors.right: parent.right
-          anchors.rightMargin: parent.height
-          height: parent.height * 0.33
-          font.pixelSize: parent.height * 0.33
-          fontSizeMode: Text.HorizontalFit
-          font.family: Theme.font
-          color: Theme.colorText
-          text: modelData.message
-          elide: Text.ElideRight
-          verticalAlignment: Text.AlignVCenter
-        }
-        Icon {
-          anchors.right: parent.right
-          height: parent.height
-          width: height
-          source: "qrc:/img/wifi_%1.png".arg(modelData.strength)
-          color: Theme.colorText
-        }
-      }
-      highlighted: networkList.highlightedIndex === index
     }
   }
 }

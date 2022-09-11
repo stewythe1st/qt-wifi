@@ -36,15 +36,13 @@ int main(int argc, char *argv[]) {
   Server* server = new Server();
   const QString jsonFileName(":/data/networks2.json");
   if(!server->readJson(jsonFileName)) {
-    qWarning() << QString("Unable to read network definition file %1.").arg(jsonFileName);
+    qWarning() << QString("Unable to read network definition file '%1'.").arg(jsonFileName);
     return 1;
   }
 
   /* Setup data layer - client */
   qmlRegisterUncreatableMetaObject(ConnectionState::staticMetaObject, "Networking", 1, 0, "ConnectionState", "");
   qmlRegisterType<Network>("Networking", 1, 0, "Network");
-  engine.addImportPath(":/qml");
-//  qmlRegisterSingletonType(QUrl(":/qml/Theme.qml"), "ca.stupid", 1, 0, "Theme2");
   ConnectionManager* connectionManager = new ConnectionManager();
   engine.rootContext()->setContextProperty("ConnectionManager", connectionManager);
   foreach(QString name, server->networkNames()) {

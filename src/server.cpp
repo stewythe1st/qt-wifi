@@ -36,8 +36,7 @@ QStringList Server::networkNames() {
 }
 
 bool Server::validateConnection(QString name, QString password) {
-  qDebug() << "validating";
-  qDebug() << name << password;
+//  qDebug() << name << password;
   foreach(const Network* network, m_networks) {
       if(network->name() == name) {
         return (password == network->password());
@@ -65,7 +64,7 @@ bool Server::readJson(QString fileName) {
   foreach(const QJsonValue &value, networks) {
       QJsonObject obj = value.toObject();
       Network* network = new Network(obj["id"].toString(), obj["auth"].toString());
-      qDebug() << network->name() << network->password();
+//      qDebug() << network->name() << network->password();
       m_networks.append(network);
   }
   return true;

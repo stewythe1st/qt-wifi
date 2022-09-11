@@ -7,6 +7,7 @@
 import QtQuick 2.15
 
 /* Qml imports */
+import QtGraphicalEffects 1.12
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -38,14 +39,14 @@ Window {
       verticalAlignment: Text.AlignVCenter
       font.pixelSize: height * 0.50
       font.family: Theme.font
+      color: Theme.colorText
     }
-
     ComboBox {
       id: networkList
       width: parent.width
       height: 50
       model: ConnectionManager.networks
-      delegate: networkDelegate
+      delegate: networkDelegateComponent
       currentIndex: -1
       onAccepted: connectButton.clicked()
       onCurrentIndexChanged: {
@@ -59,19 +60,45 @@ Window {
         elide: Text.ElideRight
         verticalAlignment: Text.AlignVCenter
         font.family: Theme.font
+        color: Theme.colorText
       }
       background: Rectangle {
-        border.color: networkList.pressed ? "#BDBDBD" : "#0066FF"
-        border.width: networkList.visualFocus ? 2 : 1
+        color: Theme.colorEditBox
+        border.color: Theme.colorSelected
+        border.width: networkList.focus ? 2 : 0
+      }
+      popup: Popup {
+        id:comboPopup
+        y: networkList.height - 1
+        width: networkList.width
+        height: contentItem.implicitHeight
+        padding: 0
+        contentItem: ListView {
+          implicitHeight: contentHeight
+          model: networkList.popup.visible ? networkList.delegateModel : null
+          ScrollIndicator.vertical: ScrollIndicator { }
+        }
+        background: Rectangle {
+          color: Theme.colorEditBox
+        }
       }
     }
     TextField {
       id: passwordField
       width: parent.width
       height: 50
+      enabled: networkList.currentIndex >= 0
       echoMode: TextInput.Password
       validator: RegularExpressionValidator { regularExpression: /^\D{1}\S{15,}$/ }
       onAccepted: connectButton.clicked()
+      color: Theme.colorText
+      selectByMouse: true
+      background: Rectangle {
+        color: Theme.colorEditBox
+        border.color: Theme.colorSelected
+        border.width: passwordField.focus ? 2 : 0
+      }
+
       MouseArea {
         height: parent.height
         width: height
@@ -84,8 +111,8 @@ Window {
           z: -1
           anchors.fill: parent
           anchors.margins: parent.height * 0.25
-          color: parent.containsMouse || (passwordField.echoMode === TextInput.Normal)
-                 ? Theme.colorText : Theme.colorInactive
+          opacity: (passwordField.echoMode === TextInput.Normal) ? 0.25 : 1.0
+          color: Theme.colorText
           source: "qrc:/img/eye.png"
         }
       }
@@ -94,6 +121,7 @@ Window {
       height: 50
       width: parent.width
       Icon {
+        id: userIcon
         height: parent.height
         width: height
         anchors.left: parent.left
@@ -107,25 +135,52 @@ Window {
           }
         }
       }
+      Glow {
+        anchors.fill: userIcon
+        radius: 3
+        samples: 10
+        color: Theme.colorText
+        source: userIcon
+      }
       Button {
         id: connectButton
         text: "Connect"
         height: parent.height
+        width: 100
         anchors.right: parent.right
         /* Seems we have to validate here too since the RegExpValidator
          * can't really check the length while typing */
         enabled: (passwordField.text.length >= 16) && (networkList.currentIndex >= 0)
         onClicked: ConnectionManager.connect(networkList.contentItem.text, passwordField.text)
+        contentItem: Text {
+          text: connectButton.text
+          font: Theme.font
+          opacity: enabled ? 1.0 : 0.3
+          color: Theme.colorText
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+          elide: Text.ElideRight
+        }
+        background: Rectangle {
+          opacity: enabled ? 1.0 : 0.3
+          color: connectButton.down ? Theme.colorEditBoxHovered : Theme.colorEditBox
+          border.color: Theme.colorSelected
+          border.width: connectButton.focus ? 2 : 0
+        }
       }
     }
   }
   Component {
-    id: networkDelegate
+    id: networkDelegateComponent
     ItemDelegate {
+      id: networkDelegate
       required property int index
       required property var modelData
       width: column.width
       height: networkList.height
+      background: Rectangle {
+        color: networkDelegate.hovered ? Theme.colorEditBoxHovered : Theme.colorEditBox
+      }
       contentItem: Item {
         Text {
           anchors.top: parent.top
@@ -136,6 +191,7 @@ Window {
           font.pixelSize: parent.height * 0.60
           fontSizeMode: Text.HorizontalFit
           font.family: Theme.font
+          color: Theme.colorText
           text: modelData.name
           elide: Text.ElideRight
           verticalAlignment: Text.AlignVCenter
@@ -149,6 +205,7 @@ Window {
           font.pixelSize: parent.height * 0.33
           fontSizeMode: Text.HorizontalFit
           font.family: Theme.font
+          color: Theme.colorText
           text: modelData.message
           elide: Text.ElideRight
           verticalAlignment: Text.AlignVCenter
@@ -158,6 +215,7 @@ Window {
           height: parent.height
           width: height
           source: "qrc:/img/wifi_%1.png".arg(modelData.strength)
+          color: Theme.colorText
         }
       }
       highlighted: networkList.highlightedIndex === index
